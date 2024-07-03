@@ -1,4 +1,4 @@
-package com.example.sudokusolver.ui.theme
+package com.example.sudokusolver.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
