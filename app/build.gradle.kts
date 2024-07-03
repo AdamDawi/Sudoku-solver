@@ -66,4 +66,17 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //viewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+
+    // Local unit tests
+    testImplementation("androidx.test:core:1.5.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2")
+    testImplementation("com.google.truth:truth:1.1.5")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
+    testImplementation("io.mockk:mockk:1.9.3")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.1")
 }
