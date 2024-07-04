@@ -6,6 +6,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.junit.Assert.*
+import kotlin.reflect.full.declaredFunctions
+import kotlin.reflect.jvm.isAccessible
 
 @RunWith(MockitoJUnitRunner::class)
 class MainViewModelTest {
@@ -22,6 +24,18 @@ class MainViewModelTest {
         arrayOf(6, 9, 2, 3, 5, 1, 8, 7, 4),
         arrayOf(7, 4, 5, 2, 8, 6, 3, 1, 9)
     )
+
+    private val correctSudoku = arrayOf(
+        arrayOf(3, 0, 6, 5, 0, 8, 4, 0, 0),
+        arrayOf(5, 2, 0, 0, 0, 0, 0, 0, 0),
+        arrayOf(0, 8, 7, 0, 0, 0, 0, 3, 1),
+        arrayOf(0, 0, 3, 0, 1, 0, 0, 8, 0),
+        arrayOf(9, 0, 0, 8, 6, 3, 0, 0, 5),
+        arrayOf(0, 5, 0, 0, 9, 0, 6, 0, 0),
+        arrayOf(1, 3, 0, 0, 0, 0, 2, 5, 0),
+        arrayOf(0, 0, 0, 0, 0, 0, 0, 7, 4),
+        arrayOf(0, 0, 5, 2, 0, 6, 3, 0, 0)
+    )
     // endregion constants
 
     // region helper fields
@@ -37,21 +51,11 @@ class MainViewModelTest {
     }
 
     @Test
-    fun solveSudoku_correctSudokuPassed_shouldReturnCorrectSudoku() {
+    fun solveSudoku_correctSudokuPassed_shouldReturnCorrectResultSudoku() {
         // arrange
-        val sudoku = arrayOf(
-            arrayOf(3, 0, 6, 5, 0, 8, 4, 0, 0),
-            arrayOf(5, 2, 0, 0, 0, 0, 0, 0, 0),
-            arrayOf(0, 8, 7, 0, 0, 0, 0, 3, 1),
-            arrayOf(0, 0, 3, 0, 1, 0, 0, 8, 0),
-            arrayOf(9, 0, 0, 8, 6, 3, 0, 0, 5),
-            arrayOf(0, 5, 0, 0, 9, 0, 6, 0, 0),
-            arrayOf(1, 3, 0, 0, 0, 0, 2, 5, 0),
-            arrayOf(0, 0, 0, 0, 0, 0, 0, 7, 4),
-            arrayOf(0, 0, 5, 2, 0, 6, 3, 0, 0)
-        )
+
         // act
-        val result = sut.solveSudoku(sudoku, 0, 0)
+        val result = sut.solveSudoku(correctSudoku)
 
         // assert
         assertMatrixEquals(fakeSudokuResult, (result as Result.Success).data)
@@ -72,7 +76,7 @@ class MainViewModelTest {
             arrayOf(0, 0, 0, 0, 0, 0, 0, 7, 4)
         )
         // act
-        val result = sut.solveSudoku(sudoku, 0, 0)
+        val result = sut.solveSudoku(sudoku)
 
         // assert
         assertEquals(Result.IncorrectSudokuFormat, result)
@@ -94,7 +98,7 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0)
         )
         // act
-        val result = sut.solveSudoku(sudoku, 0, 0)
+        val result = sut.solveSudoku(sudoku)
 
         // assert
         assertEquals(Result.IncorrectSudokuFormat, result)
@@ -115,11 +119,64 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0, 3)
         )
         // act
-        val result = sut.solveSudoku(sudoku, 0, 0)
+        val result = sut.solveSudoku(sudoku)
 
         // assert
         assertEquals(Result.NoResultSudoku, result)
     }
+
+    @Test
+    fun isSafe_notDuplicatedNumPassed_shouldReturnTrue() {
+        // arrange
+        val isSafeMethod = sut::class.declaredFunctions.find { it.name == "isSafe" }
+        isSafeMethod?.isAccessible = true
+
+        // act
+        val result = isSafeMethod?.call(sut, correctSudoku, 0, 1, 1) as Boolean
+
+        // assert
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun isSafe_duplicatedNumWithinBoxPassed_shouldReturnFalse() {
+        // arrange
+        val isSafeMethod = sut::class.declaredFunctions.find { it.name == "isSafe" }
+        isSafeMethod?.isAccessible = true
+
+        // act
+        val result = isSafeMethod?.call(sut, correctSudoku, 0, 0, 3) as Boolean
+
+        // assert
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun isSafe_duplicatedNumWithinRowPassed_shouldReturnFalse() {
+        // arrange
+        val isSafeMethod = sut::class.declaredFunctions.find { it.name == "isSafe" }
+        isSafeMethod?.isAccessible = true
+
+        // act
+        val result = isSafeMethod?.call(sut, correctSudoku, 0, 0, 1) as Boolean
+
+        // assert
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun isSafe_duplicatedNumWithinColPassed_shouldReturnFalse() {
+        // arrange
+        val isSafeMethod = sut::class.declaredFunctions.find { it.name == "isSafe" }
+        isSafeMethod?.isAccessible = true
+
+        // act
+        val result = isSafeMethod?.call(sut, correctSudoku, 3, 1, 2) as Boolean
+
+        // assert
+        assertEquals(false, result)
+    }
+
 
     // region helper methods
 
