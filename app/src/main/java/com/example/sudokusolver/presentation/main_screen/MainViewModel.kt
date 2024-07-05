@@ -30,7 +30,7 @@ class MainViewModel: ViewModel() {
         return Result.NoResultSudoku
     }
 
-    private fun isSafe(sudoku: Array<Array<Int>>, row: Int, col: Int, num:Int): Boolean {
+    private fun isSafe(sudoku: Array<Array<Int>>, row: Int, col: Int, num: Int): Boolean {
         // row
         for(i in 0 until 9){
             if(sudoku[row][i] == num) return false
