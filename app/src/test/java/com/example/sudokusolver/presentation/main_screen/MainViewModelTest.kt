@@ -1,16 +1,26 @@
 package com.example.sudokusolver.presentation.main_screen
 
 import com.example.sudokusolver.common.Result
+import com.example.sudokusolver.utils.ReplaceMainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
-import org.junit.Assert.*
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.isAccessible
 
 @RunWith(MockitoJUnitRunner::class)
 class MainViewModelTest {
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @get: Rule
+    val replaceMainDispatcherRule = ReplaceMainDispatcherRule()
 
     // region constants
     private val fakeSudokuResult = arrayOf(
@@ -43,19 +53,24 @@ class MainViewModelTest {
     // endregion helper fields
 
     private lateinit var sut: MainViewModel
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
-        sut = MainViewModel()
+        sut = MainViewModel(testDispatcher)
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun solveSudoku_correctSudokuPassed_shouldReturnCorrectResultSudoku() {
+    fun solveSudoku_correctSudokuPassed_shouldReturnCorrectResultSudoku() = runTest{
         // arrange
 
         // act
-        val result = sut.solveSudoku(correctSudoku)
+        var result: Result? = null
+        sut.solveSudoku(correctSudoku) { funResult -> result = funResult }
+        advanceUntilIdle()
 
         // assert
         assertMatrixEquals(fakeSudokuResult, (result as Result.Success).data)
@@ -76,10 +91,11 @@ class MainViewModelTest {
             arrayOf(0, 0, 0, 0, 0, 0, 0, 7, 4)
         )
         // act
-        val result = sut.solveSudoku(sudoku)
+        var result: Result? = null
+        sut.solveSudoku(sudoku) { funResult -> result = funResult }
 
         // assert
-        assertEquals(Result.IncorrectSudokuFormat, result)
+        assertEquals(Result.IncorrectSudoku, result)
     }
 
     @Test
@@ -98,10 +114,11 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0)
         )
         // act
-        val result = sut.solveSudoku(sudoku)
+        var result: Result? = null
+        sut.solveSudoku(sudoku) { funResult -> result = funResult }
 
         // assert
-        assertEquals(Result.IncorrectSudokuFormat, result)
+        assertEquals(Result.IncorrectSudoku, result)
     }
 
     @Test
@@ -119,10 +136,11 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0, 3)
         )
         // act
-        val result = sut.solveSudoku(sudoku)
+        var result: Result? = null
+        sut.solveSudoku(sudoku) { funResult -> result = funResult }
 
         // assert
-        assertEquals(Result.NoResultSudoku, result)
+        assertEquals(Result.IncorrectSudoku, result)
     }
 
     @Test

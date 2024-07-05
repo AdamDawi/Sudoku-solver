@@ -10,31 +10,33 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sudokusolver.common.Border
 import com.example.sudokusolver.common.border
+import com.example.sudokusolver.presentation.ui.theme.LightGreen
 
 @Composable
 fun SudokuBoard(
+    modifier: Modifier = Modifier,
     grid: MutableList<MutableList<MutableState<String>>>,
+    isCellNew: MutableList<MutableList<MutableState<Boolean>>>,
     onCellClick: (Int, Int) -> Unit,
     selectedCell: Pair<Int, Int>
 ) {
-
     Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .background(Color.White),
+        modifier = modifier,
         verticalArrangement = Arrangement.Center
     ) {
         for (i in 0 until 9) {
@@ -62,11 +64,11 @@ fun SudokuBoard(
                                 )
                                 .clickable { onCellClick(i, j) }
                         ) {
-                            val cellValue = grid[i][j].value
                             Canvas(modifier = Modifier.fillMaxSize()) {
+                                val cellValue = grid[i][j].value
                                 if (cellValue.isNotEmpty()) {
                                     val textPaint = Paint().apply {
-                                        color = android.graphics.Color.BLACK
+                                        color = if (isCellNew[i][j].value) LightGreen.toArgb() else android.graphics.Color.BLACK
                                         textSize = 40f
                                         textAlign = Paint.Align.CENTER
                                     }
@@ -92,8 +94,9 @@ fun SudokuBoard(
 @Composable
 private fun SudokuBoardPreview() {
     SudokuBoard(
-        grid = mutableListOf(),
+        grid = mutableListOf(*Array(9) { MutableList(9) { mutableStateOf("1") } }),
         onCellClick = { _, _ -> },
-        selectedCell = Pair(0, 0)
+        selectedCell = Pair(0, 0),
+        isCellNew = mutableListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } })
     )
 }

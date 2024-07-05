@@ -19,10 +19,18 @@ fun SnapshotStateList<MutableList<MutableState<String>>>.updateFrom(result: Arra
     }
 }
 
-fun SnapshotStateList<MutableList<MutableState<String>>>.clearState() {
+fun SnapshotStateList<MutableList<MutableState<String>>>.clearStringState() {
     for (i in 0 until 9) {
         for (j in 0 until 9) {
             this[i][j].value = ""
+        }
+    }
+}
+
+fun SnapshotStateList<MutableList<MutableState<Boolean>>>.clearBooleanState() {
+    for (i in 0 until 9) {
+        for (j in 0 until 9) {
+            this[i][j].value = false
         }
     }
 }
