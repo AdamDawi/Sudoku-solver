@@ -190,7 +190,8 @@ fun ButtonsRow(
         ) {
             Text(
                 text = "Solve",
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                color = Color.White
             )
         }
 

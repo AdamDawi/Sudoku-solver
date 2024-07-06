@@ -49,7 +49,13 @@ fun SudokuBoard(
                                 value = grid[i][j].value,
                                 isNew = isCellNew[i][j].value,
                                 isSelected = i == selectedCell.first && j == selectedCell.second,
-                                onClick = { onCellClick(i, j) }
+                                onClick = { onCellClick(i, j) },
+                                bottomBorder = if (i % 3 == 2) Border(2.dp, Color.Black)
+                                else Border(1.dp, Color.LightGray),
+                                endBorder =
+                                if (j % 3 == 2) Border(2.dp, Color.Black) else Border(1.dp, Color.LightGray),
+                                startBorder = if (j == 0) Border(2.dp, Color.Black) else null,
+                                topBorder = if (i == 0) Border(2.dp, Color.Black) else null
                             )
                         }
                     }
@@ -65,7 +71,11 @@ fun SudokuCell(
     value: String,
     isNew: Boolean,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    topBorder: Border?,
+    bottomBorder: Border?,
+    endBorder: Border?,
+    startBorder: Border?
 ) {
     val backgroundColor = if (isSelected) Color.LightGray else Color.White
     val textColor = if (isNew) LightGreen else Color.Black
@@ -76,10 +86,10 @@ fun SudokuCell(
             .size(40.dp)
             .background(backgroundColor)
             .border(
-                start = Border(1.dp, Color.Black),
-                top = Border(1.dp, Color.Black),
-                end = Border(1.dp, Color.Black),
-                bottom = Border(1.dp, Color.Black)
+                start = startBorder,
+                top = topBorder,
+                end = endBorder,
+                bottom = bottomBorder
             )
             .clickable { onClick() }
     ) {
