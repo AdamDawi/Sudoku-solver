@@ -1,6 +1,6 @@
 package com.example.sudokusolver.presentation.main_screen
 
-import com.example.sudokusolver.common.Result
+import com.example.sudokusolver.common.SudokuSolution
 import com.example.sudokusolver.utils.ReplaceMainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -68,12 +68,12 @@ class MainViewModelTest {
         // arrange
 
         // act
-        var result: Result? = null
-        sut.solveSudoku(correctSudoku) { funResult -> result = funResult }
+        var sudokuSolution: SudokuSolution? = null
+        sut.solveSudoku(correctSudoku) { funResult -> sudokuSolution = funResult }
         advanceUntilIdle()
 
         // assert
-        assertMatrixEquals(fakeSudokuResult, (result as Result.Success).data)
+        assertMatrixEquals(fakeSudokuResult, (sudokuSolution as SudokuSolution.Success).data)
     }
 
     @Test
@@ -91,11 +91,11 @@ class MainViewModelTest {
             arrayOf(0, 0, 0, 0, 0, 0, 0, 7, 4)
         )
         // act
-        var result: Result? = null
-        sut.solveSudoku(sudoku) { funResult -> result = funResult }
+        var sudokuSolution: SudokuSolution? = null
+        sut.solveSudoku(sudoku) { funResult -> sudokuSolution = funResult }
 
         // assert
-        assertEquals(Result.IncorrectSudoku, result)
+        assertEquals(SudokuSolution.IncorrectSudoku, sudokuSolution)
     }
 
     @Test
@@ -114,11 +114,11 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0)
         )
         // act
-        var result: Result? = null
-        sut.solveSudoku(sudoku) { funResult -> result = funResult }
+        var sudokuSolution: SudokuSolution? = null
+        sut.solveSudoku(sudoku) { funResult -> sudokuSolution = funResult }
 
         // assert
-        assertEquals(Result.IncorrectSudoku, result)
+        assertEquals(SudokuSolution.IncorrectSudoku, sudokuSolution)
     }
 
     @Test
@@ -136,11 +136,11 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0, 3)
         )
         // act
-        var result: Result? = null
-        sut.solveSudoku(sudoku) { funResult -> result = funResult }
+        var sudokuSolution: SudokuSolution? = null
+        sut.solveSudoku(sudoku) { funResult -> sudokuSolution = funResult }
 
         // assert
-        assertEquals(Result.IncorrectSudoku, result)
+        assertEquals(SudokuSolution.IncorrectSudoku, sudokuSolution)
     }
 
     @Test

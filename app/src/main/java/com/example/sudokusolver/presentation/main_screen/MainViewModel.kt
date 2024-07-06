@@ -2,7 +2,7 @@ package com.example.sudokusolver.presentation.main_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sudokusolver.common.Result
+import com.example.sudokusolver.common.SudokuSolution
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,10 +12,10 @@ class MainViewModel(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ): ViewModel() {
     private val UNASSIGNED = 0
-    fun solveSudoku(sudoku: Array<Array<Int>>, onResult: (Result) -> Unit) {
+    fun solveSudoku(sudoku: Array<Array<Int>>, onResult: (SudokuSolution) -> Unit) {
         viewModelScope.launch(dispatcher) {
             if (!checkIfSudokuIsValid(sudoku)) {
-                onResult(Result.IncorrectSudoku)
+                onResult(SudokuSolution.IncorrectSudoku)
                 return@launch
             }
 
@@ -24,27 +24,27 @@ class MainViewModel(
         }
     }
 
-    private fun solveSudokuInternal(sudoku: Array<Array<Int>>): Result {
+    private fun solveSudokuInternal(sudoku: Array<Array<Int>>): SudokuSolution {
         // find empty cell
         var row = 0
         var col = 0
         isEmptyCellInSudoku(sudoku)?.let { result ->
             row = result.first
             col = result.second
-        } ?: return Result.Success(sudoku)
+        } ?: return SudokuSolution.Success(sudoku)
 
         for (i in 1..9) {
             if (isSafe(sudoku, row, col, i)) {
                 sudoku[row][col] = i
                 val result = solveSudokuInternal(sudoku)
-                if (result is Result.Success) {
+                if (result is SudokuSolution.Success) {
                     return result
                 }
                 sudoku[row][col] = UNASSIGNED
             }
         }
 
-        return Result.IncorrectSudoku
+        return SudokuSolution.IncorrectSudoku
     }
 
     private fun isSafe(sudoku: Array<Array<Int>>, row: Int, col: Int, num: Int): Boolean {

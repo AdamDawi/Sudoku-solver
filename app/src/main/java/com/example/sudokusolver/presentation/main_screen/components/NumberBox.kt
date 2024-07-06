@@ -9,6 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.sudokusolver.presentation.ui.theme.FadedOrange
 
@@ -23,8 +25,11 @@ fun NumberBox(
         .background(FadedOrange)
         .clickable { onClick() }
         .padding(12.dp)
-
     ){
-        Text(text = number.toString())
+        Text(
+            text = number.toString(),
+            fontWeight = FontWeight.SemiBold,
+            color = Color.White
+        )
     }
 }

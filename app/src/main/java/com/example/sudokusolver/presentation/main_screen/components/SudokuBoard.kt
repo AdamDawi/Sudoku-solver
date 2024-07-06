@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,51 +39,65 @@ fun SudokuBoard(
         verticalArrangement = Arrangement.Center
     ) {
         for (i in 0 until 9) {
-            Row {
-                for (j in 0 until 9) {
-                    key(j){
-                        val bottomBorder =
-                            if (i % 3 == 2) Border(2.dp, Color.Black) else Border(1.dp, Color.LightGray)
-                        val endBorder =
-                            if (j % 3 == 2) Border(2.dp, Color.Black) else Border(1.dp, Color.LightGray)
-                        val startBorder = if (j == 0) Border(2.dp, Color.Black) else null
-                        val topBorder = if (i == 0) Border(2.dp, Color.Black) else null
-
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .weight(1f)
-                                .size(40.dp)
-                                .background(if (i == selectedCell.first && j == selectedCell.second) Color.LightGray else Color.White)
-                                .border(
-                                    start = startBorder,
-                                    top = topBorder,
-                                    end = endBorder,
-                                    bottom = bottomBorder
-                                )
-                                .clickable { onCellClick(i, j) }
-                        ) {
-                            Canvas(modifier = Modifier.fillMaxSize()) {
-                                val cellValue = grid[i][j].value
-                                if (cellValue.isNotEmpty()) {
-                                    val textPaint = Paint().apply {
-                                        color = if (isCellNew[i][j].value) LightGreen.toArgb() else android.graphics.Color.BLACK
-                                        textSize = 40f
-                                        textAlign = Paint.Align.CENTER
-                                    }
-
-                                    val textBounds = Rect()
-                                    textPaint.getTextBounds(cellValue, 0, cellValue.length, textBounds)
-
-                                    val x = size.width / 2
-                                    val y = size.height / 2 + textBounds.height() / 2 - textBounds.bottom
-
-                                    drawContext.canvas.nativeCanvas.drawText(cellValue, x, y, textPaint)
-                                }
-                            }
+            key(i) {
+                Row {
+                    for (j in 0 until 9) {
+                        key(j) {
+                            SudokuCell(
+                                modifier = Modifier
+                                    .weight(1f),
+                                value = grid[i][j].value,
+                                isNew = isCellNew[i][j].value,
+                                isSelected = i == selectedCell.first && j == selectedCell.second,
+                                onClick = { onCellClick(i, j) }
+                            )
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun SudokuCell(
+    modifier: Modifier = Modifier,
+    value: String,
+    isNew: Boolean,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (isSelected) Color.LightGray else Color.White
+    val textColor = if (isNew) LightGreen else Color.Black
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(40.dp)
+            .background(backgroundColor)
+            .border(
+                start = Border(1.dp, Color.Black),
+                top = Border(1.dp, Color.Black),
+                end = Border(1.dp, Color.Black),
+                bottom = Border(1.dp, Color.Black)
+            )
+            .clickable { onClick() }
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            if (value.isNotEmpty()) {
+                val textPaint = Paint().apply {
+                    color = textColor.toArgb()
+                    textSize = 40f
+                    textAlign = Paint.Align.CENTER
+                }
+
+                val textBounds = Rect()
+                textPaint.getTextBounds(value, 0, value.length, textBounds)
+
+                val x = size.width / 2
+                val y = size.height / 2 + textBounds.height() / 2 - textBounds.bottom
+
+                drawContext.canvas.nativeCanvas.drawText(value, x, y, textPaint)
             }
         }
     }

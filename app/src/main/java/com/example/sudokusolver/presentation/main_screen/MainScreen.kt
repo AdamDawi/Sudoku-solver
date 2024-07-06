@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sudokusolver.common.Result
+import com.example.sudokusolver.common.SudokuSolution
 import com.example.sudokusolver.common.clearBooleanState
 import com.example.sudokusolver.common.clearStringState
 import com.example.sudokusolver.common.toIntGrid
@@ -51,8 +51,8 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     // Initialize the grid with empty cells with spread operator (*)
-    val grid = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
-    val isCellNew = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
+    val sudokuGrid = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
+    val isCellModified = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
     var selectedCell by remember { mutableStateOf(Pair(0, 0)) }
     var isEnableSolveButton by remember {
         mutableStateOf(true)
@@ -69,10 +69,10 @@ fun MainScreen(
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .background(Color.White),
-            grid = grid,
+            grid = sudokuGrid,
             onCellClick = { i, j -> selectedCell = i to j },
             selectedCell = selectedCell,
-            isCellNew = isCellNew
+            isCellNew = isCellModified
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -80,7 +80,7 @@ fun MainScreen(
         NumbersRow(
             modifier = Modifier.fillMaxWidth()
         ) { number ->
-            grid[selectedCell.first][selectedCell.second].value = number.toString()
+            sudokuGrid[selectedCell.first][selectedCell.second].value = number.toString()
         }
 
         ButtonsRow(
@@ -89,35 +89,37 @@ fun MainScreen(
                 .padding(16.dp),
             onSolveClick = {
                 isEnableSolveButton = false
-                viewModel.solveSudoku(grid.toIntGrid()) { result ->
+                viewModel.solveSudoku(sudokuGrid.toIntGrid()) { result ->
                     when (result) {
-                        Result.IncorrectSudoku ->{
+                        SudokuSolution.IncorrectSudoku ->{
                             CoroutineScope(Dispatchers.Main).launch {
                                 Toast.makeText(context, "Incorrect sudoku", Toast.LENGTH_SHORT).show()
                             }
                             isEnableSolveButton = true
                         }
-                        is Result.Success -> {
+                        is SudokuSolution.Success -> {
                             for (i in 0 until 9) {
                                 for (j in 0 until 9) {
-                                    if (grid[i][j].value != result.data[i][j].toString()) {
-                                        grid[i][j].value = result.data[i][j].toString()
-                                        isCellNew[i][j].value = true
+                                    if (sudokuGrid[i][j].value != result.data[i][j].toString()) {
+                                        sudokuGrid[i][j].value = result.data[i][j].toString()
+                                        isCellModified[i][j].value = true
                                     }
                                 }
                             }
-                            grid.updateFrom(result.data)
+                            sudokuGrid.updateFrom(result.data)
                             isEnableSolveButton = true
                         }
                     }
                 }
             },
             onClearClick = {
-                grid[selectedCell.first][selectedCell.second].value = ""
+                if (sudokuGrid[selectedCell.first][selectedCell.second].value.isNotEmpty()) {
+                    sudokuGrid[selectedCell.first][selectedCell.second].value = ""
+                }
             },
             onClearAllClick = {
-                grid.clearStringState()
-                isCellNew.clearBooleanState()
+                sudokuGrid.clearStringState()
+                isCellModified.clearBooleanState()
             },
             isEnableSolveButton = isEnableSolveButton
         )
@@ -175,7 +177,7 @@ fun ButtonsRow(
             Icon(
                 modifier = Modifier.size(35.dp),
                 imageVector = Icons.Default.Clear,
-                contentDescription = "Clear",
+                contentDescription = "Clear cell",
                 tint = FadedOrange
             )
         }
@@ -198,7 +200,7 @@ fun ButtonsRow(
             Icon(
                 modifier = Modifier.size(35.dp),
                 imageVector = Icons.Default.Delete,
-                contentDescription = "Clear all",
+                contentDescription = "Clear all cells",
                 tint = FadedOrange
             )
         }
