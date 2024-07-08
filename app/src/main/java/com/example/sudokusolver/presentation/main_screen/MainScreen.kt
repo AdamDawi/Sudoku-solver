@@ -53,16 +53,13 @@ fun MainScreen(
     val sudokuGrid = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
     val isCellModified = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
     var selectedCell by remember { mutableStateOf(Pair(0, 0)) }
-    var isEnableSolveButton by remember {
-        mutableStateOf(true)
-    }
+    val isEnableSolveButton by viewModel.isEnableSolveButton.collectAsState()
     val solveResult by viewModel.solveResult.collectAsState()
 
     LaunchedEffect(solveResult) {
         when (solveResult) {
             is SudokuSolution.IncorrectSudoku -> {
                 Toast.makeText(context, "Incorrect sudoku", Toast.LENGTH_SHORT).show()
-                isEnableSolveButton = true
             }
             is SudokuSolution.Success -> {
                 (solveResult as SudokuSolution.Success).let { result ->
@@ -76,7 +73,6 @@ fun MainScreen(
                     }
                     sudokuGrid.updateFrom(result.data)
                 }
-                isEnableSolveButton = true
             }
             null -> {
                 // initialize state
@@ -114,7 +110,6 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(16.dp),
             onSolveClick = {
-                isEnableSolveButton = false
                 viewModel.solveSudoku(sudokuGrid.toIntGrid())
             },
             onClearClick = {

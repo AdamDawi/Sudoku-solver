@@ -1,5 +1,6 @@
 package com.example.sudokusolver.domain.use_cases
 
+import android.util.Log
 import com.example.sudokusolver.common.SudokuSolution
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

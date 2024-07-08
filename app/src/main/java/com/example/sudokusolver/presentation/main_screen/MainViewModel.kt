@@ -14,10 +14,17 @@ class MainViewModel(
 
     private val _solveResult = MutableStateFlow<SudokuSolution?>(null)
     val solveResult: StateFlow<SudokuSolution?> = _solveResult
+
+    private val _isEnableSolveButton = MutableStateFlow(true)
+    val isEnableSolveButton: StateFlow<Boolean> = _isEnableSolveButton
     fun solveSudoku(sudoku: Array<Array<Int>>){
+        // for launch effect to work properly value = null is required
+        _solveResult.value = null
         viewModelScope.launch {
+            _isEnableSolveButton.value = false
             val result = solveSudokuUseCase.solveSudoku(sudoku)
             _solveResult.value = result
+            _isEnableSolveButton.value = true
         }
     }
 }
