@@ -1,4 +1,4 @@
-package com.example.sudokusolver.presentation.main_screen
+package com.example.sudokusolver.domain.use_cases
 
 import com.example.sudokusolver.common.SudokuSolution
 import com.example.sudokusolver.utils.ReplaceMainDispatcherRule
@@ -6,17 +6,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
+import org.junit.Assert.*
+import org.junit.Rule
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.isAccessible
 
 @RunWith(MockitoJUnitRunner::class)
-class MainViewModelTest {
+class SolveSudokuUseCaseTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @get: Rule
@@ -52,13 +52,13 @@ class MainViewModelTest {
 
     // endregion helper fields
 
-    private lateinit var sut: MainViewModel
+    private lateinit var sut: SolveSudokuUseCase
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
-        sut = MainViewModel(testDispatcher)
+        sut = SolveSudokuUseCase(testDispatcher)
 
     }
 
@@ -68,8 +68,7 @@ class MainViewModelTest {
         // arrange
 
         // act
-        var sudokuSolution: SudokuSolution? = null
-        sut.solveSudoku(correctSudoku) { funResult -> sudokuSolution = funResult }
+        val sudokuSolution = sut.solveSudoku(correctSudoku)
         advanceUntilIdle()
 
         // assert
@@ -77,7 +76,7 @@ class MainViewModelTest {
     }
 
     @Test
-    fun solveSudoku_incorrectNumberOfRowsSudokuPassed_shouldReturnIncorrectSudokuFormatError() {
+    fun solveSudoku_incorrectNumberOfRowsSudokuPassed_shouldReturnIncorrectSudokuFormatError() = runTest {
         // arrange
         // 8x9
         val sudoku = arrayOf(
@@ -91,15 +90,14 @@ class MainViewModelTest {
             arrayOf(0, 0, 0, 0, 0, 0, 0, 7, 4)
         )
         // act
-        var sudokuSolution: SudokuSolution? = null
-        sut.solveSudoku(sudoku) { funResult -> sudokuSolution = funResult }
+        val sudokuSolution = sut.solveSudoku(sudoku)
 
         // assert
         assertEquals(SudokuSolution.IncorrectSudoku, sudokuSolution)
     }
 
     @Test
-    fun solveSudoku_incorrectNumberOfColumnsSudokuPassed_shouldReturnIncorrectSudokuFormatError() {
+    fun solveSudoku_incorrectNumberOfColumnsSudokuPassed_shouldReturnIncorrectSudokuFormatError() = runTest{
         // arrange
         // 9x8
         val sudoku = arrayOf(
@@ -114,15 +112,14 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0)
         )
         // act
-        var sudokuSolution: SudokuSolution? = null
-        sut.solveSudoku(sudoku) { funResult -> sudokuSolution = funResult }
+        val sudokuSolution = sut.solveSudoku(sudoku)
 
         // assert
         assertEquals(SudokuSolution.IncorrectSudoku, sudokuSolution)
     }
 
     @Test
-    fun solveSudoku_sudokuWithNoSolutionPassed_shouldReturnNoSolutionError() {
+    fun solveSudoku_sudokuWithNoSolutionPassed_shouldReturnNoSolutionError() = runTest{
         // arrange
         val sudoku = arrayOf(
             arrayOf(3, 0, 6, 5, 0, 8, 4, 0, 0),
@@ -136,15 +133,14 @@ class MainViewModelTest {
             arrayOf(0, 0, 5, 2, 0, 6, 3, 0, 3)
         )
         // act
-        var sudokuSolution: SudokuSolution? = null
-        sut.solveSudoku(sudoku) { funResult -> sudokuSolution = funResult }
+        val sudokuSolution = sut.solveSudoku(sudoku)
 
         // assert
         assertEquals(SudokuSolution.IncorrectSudoku, sudokuSolution)
     }
 
     @Test
-    fun isSafe_notDuplicatedNumPassed_shouldReturnTrue() {
+    fun isSafe_notDuplicatedNumPassed_shouldReturnTrue(){
         // arrange
         val isSafeMethod = sut::class.declaredFunctions.find { it.name == "isSafe" }
         isSafeMethod?.isAccessible = true

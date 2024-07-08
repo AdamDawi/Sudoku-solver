@@ -20,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
@@ -41,9 +43,6 @@ import com.example.sudokusolver.common.updateFrom
 import com.example.sudokusolver.presentation.main_screen.components.NumberBox
 import com.example.sudokusolver.presentation.main_screen.components.SudokuBoard
 import com.example.sudokusolver.presentation.ui.theme.FadedOrange
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
@@ -56,6 +55,33 @@ fun MainScreen(
     var selectedCell by remember { mutableStateOf(Pair(0, 0)) }
     var isEnableSolveButton by remember {
         mutableStateOf(true)
+    }
+    val solveResult by viewModel.solveResult.collectAsState()
+
+    LaunchedEffect(solveResult) {
+        when (solveResult) {
+            is SudokuSolution.IncorrectSudoku -> {
+                Toast.makeText(context, "Incorrect sudoku", Toast.LENGTH_SHORT).show()
+                isEnableSolveButton = true
+            }
+            is SudokuSolution.Success -> {
+                (solveResult as SudokuSolution.Success).let { result ->
+                    for (i in 0 until 9) {
+                        for (j in 0 until 9) {
+                            if (sudokuGrid[i][j].value != result.data[i][j].toString()) {
+                                sudokuGrid[i][j].value = result.data[i][j].toString()
+                                isCellModified[i][j].value = true
+                            }
+                        }
+                    }
+                    sudokuGrid.updateFrom(result.data)
+                }
+                isEnableSolveButton = true
+            }
+            null -> {
+                // initialize state
+            }
+        }
     }
     Column(
         modifier = Modifier
@@ -89,28 +115,7 @@ fun MainScreen(
                 .padding(16.dp),
             onSolveClick = {
                 isEnableSolveButton = false
-                viewModel.solveSudoku(sudokuGrid.toIntGrid()) { result ->
-                    when (result) {
-                        SudokuSolution.IncorrectSudoku ->{
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(context, "Incorrect sudoku", Toast.LENGTH_SHORT).show()
-                            }
-                            isEnableSolveButton = true
-                        }
-                        is SudokuSolution.Success -> {
-                            for (i in 0 until 9) {
-                                for (j in 0 until 9) {
-                                    if (sudokuGrid[i][j].value != result.data[i][j].toString()) {
-                                        sudokuGrid[i][j].value = result.data[i][j].toString()
-                                        isCellModified[i][j].value = true
-                                    }
-                                }
-                            }
-                            sudokuGrid.updateFrom(result.data)
-                            isEnableSolveButton = true
-                        }
-                    }
-                }
+                viewModel.solveSudoku(sudokuGrid.toIntGrid())
             },
             onClearClick = {
                 if (sudokuGrid[selectedCell.first][selectedCell.second].value.isNotEmpty()) {
@@ -127,7 +132,7 @@ fun MainScreen(
 }
 
 @Composable
-fun Title(
+private fun Title(
     modifier: Modifier = Modifier
 ) {
     Text(
@@ -139,7 +144,7 @@ fun Title(
 }
 
 @Composable
-fun NumbersRow(
+private fun NumbersRow(
     modifier: Modifier = Modifier,
     onNumberClick: (Int) -> Unit
 ) {
@@ -159,7 +164,7 @@ fun NumbersRow(
 }
 
 @Composable
-fun ButtonsRow(
+private fun ButtonsRow(
     modifier: Modifier = Modifier,
     onSolveClick: () -> Unit,
     onClearClick: () -> Unit,

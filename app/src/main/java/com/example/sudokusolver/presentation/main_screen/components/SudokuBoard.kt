@@ -66,7 +66,7 @@ fun SudokuBoard(
 }
 
 @Composable
-fun SudokuCell(
+private fun SudokuCell(
     modifier: Modifier = Modifier,
     value: String,
     isNew: Boolean,
