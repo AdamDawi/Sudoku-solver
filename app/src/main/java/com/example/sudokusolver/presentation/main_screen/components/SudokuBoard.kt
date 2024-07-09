@@ -20,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sudokusolver.common.Border
+import com.example.sudokusolver.common.TestTags
 import com.example.sudokusolver.common.border
 import com.example.sudokusolver.presentation.ui.theme.LightGreen
 
@@ -45,7 +47,8 @@ fun SudokuBoard(
                         key(j) {
                             SudokuCell(
                                 modifier = Modifier
-                                    .weight(1f),
+                                    .weight(1f)
+                                    .testTag(TestTags.SUDOKU_CELL),
                                 value = grid[i][j].value,
                                 isNew = isCellNew[i][j].value,
                                 isSelected = i == selectedCell.first && j == selectedCell.second,
@@ -93,7 +96,10 @@ private fun SudokuCell(
             )
             .clickable { onClick() }
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier
+            .fillMaxSize()
+            .testTag(value.ifEmpty { TestTags.EMPTY_CELL })
+        ) {
             if (value.isNotEmpty()) {
                 val textPaint = Paint().apply {
                     color = textColor.toArgb()

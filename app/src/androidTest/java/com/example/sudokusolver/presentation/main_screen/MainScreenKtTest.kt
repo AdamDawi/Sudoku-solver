@@ -1,15 +1,22 @@
 package com.example.sudokusolver.presentation.main_screen
 
 import androidx.activity.compose.setContent
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.sudokusolver.common.SudokuSolution
+import com.example.sudokusolver.common.TestTags
 import com.example.sudokusolver.domain.use_cases.SolveSudokuUseCase
 import com.example.sudokusolver.presentation.MainActivity
 import com.example.sudokusolver.presentation.ui.theme.SudokuSolverTheme
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -17,6 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+
 
 @RunWith(AndroidJUnit4::class)
 class MainScreenKtTest {
@@ -32,18 +40,6 @@ class MainScreenKtTest {
         arrayOf(1, 3, 8, 9, 4, 7, 2, 5, 6),
         arrayOf(6, 9, 2, 3, 5, 1, 8, 7, 4),
         arrayOf(7, 4, 5, 2, 8, 6, 3, 1, 9)
-    )
-
-    private val correctSudoku = arrayOf(
-        arrayOf(3, 0, 6, 5, 0, 8, 4, 0, 0),
-        arrayOf(5, 2, 0, 0, 0, 0, 0, 0, 0),
-        arrayOf(0, 8, 7, 0, 0, 0, 0, 3, 1),
-        arrayOf(0, 0, 3, 0, 1, 0, 0, 8, 0),
-        arrayOf(9, 0, 0, 8, 6, 3, 0, 0, 5),
-        arrayOf(0, 5, 0, 0, 9, 0, 6, 0, 0),
-        arrayOf(1, 3, 0, 0, 0, 0, 2, 5, 0),
-        arrayOf(0, 0, 0, 0, 0, 0, 0, 7, 4),
-        arrayOf(0, 0, 5, 2, 0, 6, 3, 0, 0)
     )
     // endregion constants
 
@@ -80,10 +76,96 @@ class MainScreenKtTest {
     }
 
     @Test
-    fun clickSolveButton_correctSudoku_displaySudoku() {
-        composeRule.onNodeWithText("Solve").performClick()
-        composeRule.onNodeWithText("1").assertExists()
+    fun sudokuSolverText_rendering_displayedCorrectly() {
+        composeRule.onNodeWithText("SUDOKU SOLVER").assertIsDisplayed()
+
     }
+
+    @Test
+    fun sudokuCells_rendering_displayedAllCorrectly() {
+        composeRule.onAllNodesWithTag("SudokuCell").assertCountEquals(81)
+    }
+
+    @Test
+    fun numberBoxes_rendering_displayedAllCorrectly() {
+        composeRule.onAllNodesWithTag("NumberBox").assertCountEquals(9)
+    }
+
+    @Test
+    fun solveButton_rendering_displayedCorrectly() {
+        composeRule.onNodeWithText("Solve").assertIsDisplayed()
+    }
+
+    @Test
+    fun clearButton_rendering_displayedCorrectly() {
+        composeRule.onNodeWithContentDescription("Clear cell").assertIsDisplayed()
+    }
+
+    @Test
+    fun clearAllButton_rendering_displayedCorrectly() {
+        composeRule.onNodeWithContentDescription("Clear all cells").assertIsDisplayed()
+    }
+
+    @Test
+    fun sudokuCellsAndBoxNumbers_click_updatesCellsCorrectly() {
+        // assert all cell tags have empty test tag
+        composeRule.onAllNodesWithTag(testTag = TestTags.EMPTY_CELL, useUnmergedTree = true).assertCountEquals(81)
+
+        // click cell
+        composeRule.onAllNodesWithTag("SudokuCell")[0].performClick()
+
+        // click number box with "1"
+        composeRule.onAllNodesWithTag("NumberBox")[0].performClick()
+
+        // check if cell is updated test tag with the selected number
+        composeRule.onNodeWithTag(testTag = "1", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun solveButton_click_solveSudokuUseCaseCalled(){
+        composeRule.onNodeWithText("Solve").performClick()
+
+        coVerify { solveSudokuUseCase.solveSudoku(any()) }
+    }
+
+    @Test
+    fun clearCellButton_click_cellCleared() {
+
+        // click cell and number box with "1"
+        composeRule.onAllNodesWithTag(TestTags.SUDOKU_CELL)[0].performClick()
+        composeRule.onAllNodesWithTag(TestTags.NUMBER_BOX)[0].performClick()
+
+        // check if cell is updated test tag with the selected number
+        composeRule.onAllNodesWithTag(testTag = TestTags.EMPTY_CELL, useUnmergedTree = true).assertCountEquals(80)
+
+        // click button to clear cell
+        composeRule.onNodeWithContentDescription("Clear cell").performClick()
+
+        // check if cell is cleared
+        composeRule.onAllNodesWithTag(testTag = TestTags.EMPTY_CELL, useUnmergedTree = true).assertCountEquals(81)
+    }
+
+    @Test
+    fun clearAllCellsButton_click_allCellsCleared() {
+
+        // click first cell and number box with "1"
+        composeRule.onAllNodesWithTag(TestTags.SUDOKU_CELL)[0].performClick()
+        composeRule.onAllNodesWithTag(TestTags.NUMBER_BOX)[0].performClick()
+
+        // click second cell and number box with "2"
+        composeRule.onAllNodesWithTag(TestTags.SUDOKU_CELL)[1].performClick()
+        composeRule.onAllNodesWithTag(TestTags.NUMBER_BOX)[1].performClick()
+
+        // check if cell is updated test tag with the selected number
+        composeRule.onAllNodesWithTag(testTag = TestTags.EMPTY_CELL, useUnmergedTree = true).assertCountEquals(79)
+
+        // click button clear all cells
+        composeRule.onNodeWithContentDescription("Clear all cells").performClick()
+
+        // check if all cells are cleared
+        composeRule.onAllNodesWithTag(testTag = TestTags.EMPTY_CELL, useUnmergedTree = true).assertCountEquals(81)
+    }
+
 
     // region helper methods
 

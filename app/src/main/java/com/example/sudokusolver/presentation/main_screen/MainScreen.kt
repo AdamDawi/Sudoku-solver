@@ -32,10 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sudokusolver.common.SudokuSolution
+import com.example.sudokusolver.common.TestTags
 import com.example.sudokusolver.common.clearBooleanState
 import com.example.sudokusolver.common.clearStringState
 import com.example.sudokusolver.common.toIntGrid
@@ -148,6 +150,7 @@ private fun NumbersRow(
         for(i in 1..9){
             key(i) {
                 NumberBox(
+                    modifier = Modifier.testTag(TestTags.NUMBER_BOX),
                     number = i,
                     onClick = { onNumberClick(i)}
                 )
@@ -205,7 +208,3 @@ private fun ButtonsRow(
         }
     }
 }
-
-
-
-
