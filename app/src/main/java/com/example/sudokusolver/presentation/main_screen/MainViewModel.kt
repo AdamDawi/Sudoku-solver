@@ -20,10 +20,10 @@ class MainViewModel(
     fun solveSudoku(sudoku: Array<Array<Int>>){
         // for launch effect to work properly value = null is required
         _solveResult.value = null
+
         viewModelScope.launch {
             _isEnableSolveButton.value = false
-            val result = solveSudokuUseCase.solveSudoku(sudoku)
-            _solveResult.value = result
+            _solveResult.value = solveSudokuUseCase.solveSudoku(sudoku)
             _isEnableSolveButton.value = true
         }
     }

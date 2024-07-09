@@ -20,22 +20,6 @@ fun SnapshotStateList<MutableList<MutableState<String>>>.toIntGrid(): Array<Arra
 }
 
 /**
- * Updates the SnapshotStateList<MutableList<MutableState<String>>> with data from a 2D array of integers.
- *
- * Each MutableState<String> in the SnapshotStateList is updated with the corresponding integer value
- * converted to String.
- *
- * @param result 2D array of integers to update the state list with
- */
-fun SnapshotStateList<MutableList<MutableState<String>>>.updateFrom(result: Array<Array<Int>>) {
-    for (i in 0 until 9) {
-        for (j in 0 until 9) {
-            this[i][j].value = result[i][j].toString()
-        }
-    }
-}
-
-/**
  * Clears the value of each MutableState<String> in the SnapshotStateList<MutableList<MutableState<String>>>.
  * Sets each value to an empty String ("").
  */

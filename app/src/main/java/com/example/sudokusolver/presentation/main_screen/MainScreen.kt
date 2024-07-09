@@ -39,7 +39,6 @@ import com.example.sudokusolver.common.SudokuSolution
 import com.example.sudokusolver.common.clearBooleanState
 import com.example.sudokusolver.common.clearStringState
 import com.example.sudokusolver.common.toIntGrid
-import com.example.sudokusolver.common.updateFrom
 import com.example.sudokusolver.presentation.main_screen.components.NumberBox
 import com.example.sudokusolver.presentation.main_screen.components.SudokuBoard
 import com.example.sudokusolver.presentation.ui.theme.FadedOrange
@@ -71,7 +70,6 @@ fun MainScreen(
                             }
                         }
                     }
-                    sudokuGrid.updateFrom(result.data)
                 }
             }
             null -> {
