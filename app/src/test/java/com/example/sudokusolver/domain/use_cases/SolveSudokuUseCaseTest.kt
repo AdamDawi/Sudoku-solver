@@ -6,19 +6,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
-import org.junit.Assert.*
 import org.junit.Rule
+import org.junit.Test
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.isAccessible
 
-@RunWith(MockitoJUnitRunner::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SolveSudokuUseCaseTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @get: Rule
     val replaceMainDispatcherRule = ReplaceMainDispatcherRule()
 
@@ -53,7 +50,6 @@ class SolveSudokuUseCaseTest {
     // endregion helper fields
 
     private lateinit var sut: SolveSudokuUseCase
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
@@ -62,7 +58,6 @@ class SolveSudokuUseCaseTest {
 
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun solveSudoku_correctSudokuPassed_shouldReturnCorrectResultSudoku() = runTest{
         // arrange
@@ -76,7 +71,41 @@ class SolveSudokuUseCaseTest {
     }
 
     @Test
-    fun solveSudoku_incorrectNumberOfRowsSudokuPassed_shouldReturnIncorrectSudokuFormatError() = runTest {
+    fun solveSudoku_correctHardSudokuPassed_shouldReturnCorrectResultSudoku() = runTest{
+        // arrange
+        val sudoku = arrayOf(
+            arrayOf(6, 0, 0, 0, 5, 0, 0, 3, 0),
+            arrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0),
+            arrayOf(0, 7, 0, 1, 0, 0, 0, 9, 0),
+            arrayOf(2, 0, 0, 0, 9, 0, 0, 5, 0),
+            arrayOf(7, 0, 0, 0, 0, 8, 0, 0, 9),
+            arrayOf(0, 0, 0, 0, 0, 0, 8, 0, 4),
+            arrayOf(0, 4, 0, 0, 8, 0, 0, 0, 0),
+            arrayOf(0, 3, 0, 0, 6, 0, 0, 7, 0),
+            arrayOf(0, 1, 0, 0, 0, 5, 3, 4, 0)
+        )
+
+        val sudokuResult = arrayOf(
+            arrayOf(6, 2, 9, 8, 5, 7, 4, 3, 1),
+            arrayOf(1, 5, 3, 9, 4, 6, 2, 8, 7),
+            arrayOf(4, 7, 8, 1, 2, 3, 5, 9, 6),
+            arrayOf(2, 8, 1, 6, 9, 4, 7, 5, 3),
+            arrayOf(7, 6, 4, 5, 3, 8, 1, 2, 9),
+            arrayOf(3, 9, 5, 7, 1, 2, 8, 6, 4),
+            arrayOf(5, 4, 7, 3, 8, 9, 6, 1, 2),
+            arrayOf(8, 3, 2, 4, 6, 1, 9, 7, 5),
+            arrayOf(9, 1, 6, 2, 7, 5, 3, 4, 8)
+        )
+        // act
+        val sudokuSolution = sut.solveSudoku(sudoku)
+        advanceUntilIdle()
+
+        // assert
+        assertMatrixEquals(sudokuResult, (sudokuSolution as SudokuSolution.Success).data)
+    }
+
+    @Test
+    fun solveSudoku_incorrectNumberOfRowsSudokuPassed_shouldReturnIncorrectSudokuError() = runTest {
         // arrange
         // 8x9
         val sudoku = arrayOf(
@@ -97,7 +126,7 @@ class SolveSudokuUseCaseTest {
     }
 
     @Test
-    fun solveSudoku_incorrectNumberOfColumnsSudokuPassed_shouldReturnIncorrectSudokuFormatError() = runTest{
+    fun solveSudoku_incorrectNumberOfColumnsSudokuPassed_shouldReturnIncorrectSudokuError() = runTest{
         // arrange
         // 9x8
         val sudoku = arrayOf(
@@ -119,7 +148,7 @@ class SolveSudokuUseCaseTest {
     }
 
     @Test
-    fun solveSudoku_sudokuWithNoSolutionPassed_shouldReturnNoSolutionError() = runTest{
+    fun solveSudoku_sudokuWithNoSolutionPassed_shouldReturnIncorrectSudokuError() = runTest{
         // arrange
         val sudoku = arrayOf(
             arrayOf(3, 0, 6, 5, 0, 8, 4, 0, 0),

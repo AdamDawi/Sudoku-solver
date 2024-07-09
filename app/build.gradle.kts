@@ -73,6 +73,9 @@ dependencies {
     // viewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
 
+    // Kotlin Reflect
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.31")
+
     // Local unit tests
     testImplementation("androidx.test:core:1.5.0")
     testImplementation("junit:junit:4.13.2")
