@@ -64,7 +64,6 @@ class MainScreenKtTest {
         // Mock the suspend function
         coEvery { solveSudokuUseCase.solveSudoku(any()) } returns SudokuSolution.Success(fakeSudokuResult)
 
-
         // Initialize the ViewModel with the mocked UseCase
         viewModel = MainViewModel(solveSudokuUseCase)
 
@@ -126,6 +125,13 @@ class MainScreenKtTest {
         composeRule.onNodeWithText("Solve").performClick()
 
         coVerify { solveSudokuUseCase.solveSudoku(any()) }
+    }
+
+    @Test
+    fun solveButton_click_allCellsAreNotEmpty(){
+        composeRule.onNodeWithText("Solve").performClick()
+
+        composeRule.onAllNodesWithTag(testTag = TestTags.EMPTY_CELL, useUnmergedTree = true).assertCountEquals(0)
     }
 
     @Test
