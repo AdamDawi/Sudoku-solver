@@ -27,6 +27,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import com.example.sudokusolver.common.SudokuSolution
 import com.example.sudokusolver.common.TestTags
 import com.example.sudokusolver.common.clearBooleanState
 import com.example.sudokusolver.common.clearStringState
+import com.example.sudokusolver.common.createGridSaver
 import com.example.sudokusolver.common.toIntGrid
 import com.example.sudokusolver.presentation.main_screen.components.NumberBox
 import com.example.sudokusolver.presentation.main_screen.components.SudokuBoard
@@ -50,9 +52,12 @@ fun MainScreen(
     viewModel: MainViewModel
 ) {
     val context = LocalContext.current
+    val sudokuGridSaver = createGridSaver<String>()
+    val cellModifiedSaver = createGridSaver<Boolean>()
+
     // Initialize the grid with empty cells with spread operator (*)
-    val sudokuGrid = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
-    val isCellModified = remember { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
+    val sudokuGrid = rememberSaveable(saver = sudokuGridSaver) { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
+    val isCellModified = rememberSaveable(saver = cellModifiedSaver) { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
     var selectedCell by remember { mutableStateOf(Pair(0, 0)) }
     val isEnableSolveButton by viewModel.isEnableSolveButton.collectAsState()
     val solveResult by viewModel.solveResult.collectAsState()
