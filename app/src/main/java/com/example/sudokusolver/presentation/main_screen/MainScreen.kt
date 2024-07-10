@@ -58,6 +58,9 @@ fun MainScreen(
     // Initialize the grid with empty cells with spread operator (*)
     val sudokuGrid = rememberSaveable(saver = sudokuGridSaver) { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
     val isCellModified = rememberSaveable(saver = cellModifiedSaver) { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
+
+//    val sudokuGrid = remember{ mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
+//    val isCellModified = remember{ mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
     var selectedCell by remember { mutableStateOf(Pair(0, 0)) }
     val isEnableSolveButton by viewModel.isEnableSolveButton.collectAsState()
     val solveResult by viewModel.solveResult.collectAsState()
@@ -155,7 +158,7 @@ private fun NumbersRow(
         for(i in 1..9){
             key(i) {
                 NumberBox(
-                    modifier = Modifier.testTag(TestTags.NUMBER_BOX),
+                    modifier = Modifier,
                     number = i,
                     onClick = { onNumberClick(i)}
                 )

@@ -47,8 +47,7 @@ fun SudokuBoard(
                         key(j) {
                             SudokuCell(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .testTag(TestTags.SUDOKU_CELL),
+                                    .weight(1f),
                                 value = grid[i][j].value,
                                 isNew = isCellNew[i][j].value,
                                 isSelected = i == selectedCell.first && j == selectedCell.second,
@@ -95,6 +94,7 @@ private fun SudokuCell(
                 bottom = bottomBorder
             )
             .clickable { onClick() }
+            .testTag(TestTags.SUDOKU_CELL)
     ) {
         Canvas(modifier = Modifier
             .fillMaxSize()
