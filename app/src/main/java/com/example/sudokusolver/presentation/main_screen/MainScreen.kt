@@ -27,18 +27,17 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sudokusolver.common.SudokuSolution
-import com.example.sudokusolver.common.TestTags
 import com.example.sudokusolver.common.clearBooleanState
 import com.example.sudokusolver.common.clearStringState
 import com.example.sudokusolver.common.createGridSaver
@@ -59,11 +58,28 @@ fun MainScreen(
     val sudokuGrid = rememberSaveable(saver = sudokuGridSaver) { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
     val isCellModified = rememberSaveable(saver = cellModifiedSaver) { mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
 
-//    val sudokuGrid = remember{ mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf("") } }) }
-//    val isCellModified = remember{ mutableStateListOf(*Array(9) { MutableList(9) { mutableStateOf(false) } }) }
     var selectedCell by remember { mutableStateOf(Pair(0, 0)) }
     val isEnableSolveButton by viewModel.isEnableSolveButton.collectAsState()
     val solveResult by viewModel.solveResult.collectAsState()
+
+    // state for lambda to skip unnecessary recomposition for number boxes
+    val onNumberClick = rememberUpdatedState { number: Int ->
+        sudokuGrid[selectedCell.first][selectedCell.second].value = number.toString()
+    }
+
+    // states for lambdas to skip unnecessary recomposition for buttons
+    val onSolveClick = rememberUpdatedState {
+        viewModel.solveSudoku(sudokuGrid.toIntGrid())
+    }
+    val onClearClick = rememberUpdatedState {
+        if (sudokuGrid[selectedCell.first][selectedCell.second].value.isNotEmpty()) {
+            sudokuGrid[selectedCell.first][selectedCell.second].value = ""
+        }
+    }
+    val onClearAllClick = rememberUpdatedState {
+        sudokuGrid.clearStringState()
+        isCellModified.clearBooleanState()
+    }
 
     LaunchedEffect(solveResult) {
         when (solveResult) {
@@ -87,6 +103,7 @@ fun MainScreen(
             }
         }
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -108,27 +125,17 @@ fun MainScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         NumbersRow(
-            modifier = Modifier.fillMaxWidth()
-        ) { number ->
-            sudokuGrid[selectedCell.first][selectedCell.second].value = number.toString()
-        }
+            modifier = Modifier.fillMaxWidth(),
+            onNumberClick = { number -> onNumberClick.value(number) }
+        )
 
         ButtonsRow(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            onSolveClick = {
-                viewModel.solveSudoku(sudokuGrid.toIntGrid())
-            },
-            onClearClick = {
-                if (sudokuGrid[selectedCell.first][selectedCell.second].value.isNotEmpty()) {
-                    sudokuGrid[selectedCell.first][selectedCell.second].value = ""
-                }
-            },
-            onClearAllClick = {
-                sudokuGrid.clearStringState()
-                isCellModified.clearBooleanState()
-            },
+            onSolveClick = { onSolveClick.value() },
+            onClearClick = { onClearClick.value() },
+            onClearAllClick = { onClearAllClick.value() },
             isEnableSolveButton = isEnableSolveButton
         )
     }
@@ -156,7 +163,7 @@ private fun NumbersRow(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         for(i in 1..9){
-            key(i) {
+            key("numberBox_$i") {
                 NumberBox(
                     modifier = Modifier,
                     number = i,
