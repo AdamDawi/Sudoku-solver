@@ -2,7 +2,7 @@
 
 Solve your Sudoku puzzles with Sudoku Solver, app built in Jetpack Compose using Kotlin and coroutines. The app allows you to input your own Sudoku puzzle and solve it with the click of a button.
 
-## Features
+## ⭐Features
 ### Main Screen 
 - **Sudoku Grid:** Click on Sudoku grid cells and input numbers from 1 to 9.
   
@@ -18,7 +18,7 @@ Solve your Sudoku puzzles with Sudoku Solver, app built in Jetpack Compose using
 - **State Preservation:** Use of `rememberSaveable` to retain state across process death and configuration changes.
 
 ## ⚙️Technologies
-### 📱 App:
+### 📱App:
 
 - **Jetpack Compose:** Leverages Jetpack Compose's declarative UI toolkit to create a modern and responsive interface.🎨
 
@@ -31,7 +31,7 @@ Solve your Sudoku puzzles with Sudoku Solver, app built in Jetpack Compose using
 - **State Flow and Mutable State:** Used in ViewModel to handle UI states.
 
 
-## ✅ Testing
+## ✅Testing
 ### Unit Testing:
 - **JUnit4:** Used for unit testing.
   
