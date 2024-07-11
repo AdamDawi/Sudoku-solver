@@ -17,8 +17,8 @@ Solve your Sudoku puzzles with Sudoku Solver, app built in Jetpack Compose using
 
 - **State Preservation:** Use of `rememberSaveable` to retain state across process death and configuration changes.
 
-## Technologies
-### App:
+## ⚙️Technologies
+### 📱 App:
 
 - **Jetpack Compose:** Leverages Jetpack Compose's declarative UI toolkit to create a modern and responsive interface.🎨
 
@@ -31,7 +31,7 @@ Solve your Sudoku puzzles with Sudoku Solver, app built in Jetpack Compose using
 - **State Flow and Mutable State:** Used in ViewModel to handle UI states.
 
 
-## ✅Testing
+## ✅ Testing
 ### Unit Testing:
 - **JUnit4:** Used for unit testing.
   
@@ -50,6 +50,8 @@ Solve your Sudoku puzzles with Sudoku Solver, app built in Jetpack Compose using
 3. Be sure the versions in gradle are same as on github
 
 ## Here are some overview pictures:
+![11](https://github.com/AdamDawi/Sudoku-solver/assets/49430055/b092ac22-1fe9-4c83-85cb-972c635f547a)
+![22](https://github.com/AdamDawi/Sudoku-solver/assets/49430055/736a5e07-c96f-4196-ad2f-22a8e251bc9c)
 
 ## Requirements
 Minimum version: Android 8.0 (API level 26) or later📱
