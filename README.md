@@ -8,7 +8,7 @@ Solve your Sudoku puzzles with Sudoku Solver, app built in Jetpack Compose using
   
 - **Clear Selected Cell:** Button to clear the currently selected cell.
   
-- **Solve Sudoku:** Button to solve the entire Sudoku puzzle with backtracikng alghoritm.
+- **Solve Sudoku:** Button to solve the entire Sudoku puzzle with backtracking alghoritm.
   
 - **Clear All Cells:** Button to clear all cells simultaneously.
 
